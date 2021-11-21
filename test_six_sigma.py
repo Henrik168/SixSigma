@@ -9,5 +9,5 @@ test_data_gaus.append(50)
 test_data_gaus.append(55)
 test_data_gaus.append(59)
 
-create_plot(test_data_gaus,lower_limit=80,dataset_name="12345-ps")
-create_histogramm(test_data_gaus,lower_limit=80,dataset_name="12345-ps")
+create_plot(test_data_gaus,lower_limit=80,dataset_name="test1")
+create_histogramm(test_data_gaus,lower_limit=80,dataset_name="test1")
