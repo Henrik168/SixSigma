@@ -58,8 +58,6 @@ class Plot:
         ax_hist.hist(data, bins=bins, orientation='horizontal')
 
     def _plot_scatter(self, data, ax, lower_limit, upper_limit) -> None:
-        ax.axis([0, len(data), self._min(data), self._max(data)])
-
         for index, value in enumerate(data):
             if not self._in_bounds(lower_limit, value, upper_limit):
                 ax.plot(index, value, "ro")
@@ -78,6 +76,7 @@ class Plot:
                               wspace=0.1)
 
         ax = fig.add_subplot(gs[0, 0])
+        ax.axis([0, len(data), self._min(data), self._max(data)])
         ax_hist = fig.add_subplot(gs[0, 1], sharey=ax)
 
         self._plot_hist(data, ax_hist, bin_width=self._bin_width)
