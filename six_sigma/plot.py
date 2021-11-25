@@ -1,6 +1,9 @@
+#Global Libraries
 import matplotlib.pyplot as plt
-from six_sigma.calc import mean, stddev, median
 from typing import Tuple
+from os import path
+#Local Libraries
+from six_sigma.calc import mean, stddev, median
 
 
 class Plot:
@@ -39,14 +42,23 @@ class Plot:
     def _in_bounds(lower, value, upper) -> bool:
         return lower <= value <= upper
 
+    def _plot_labels(self, ax, ax_hist, title):
+        plt.suptitle(title)
+        handles, _ = ax.get_legend_handles_labels()
+        ax.legend(handles=handles)
+        ax.set(xlabel=self._x_data_label, ylabel=self._y_label)
+        ax_hist.set(xlabel=self._x_hist_label)
+        ax_hist.tick_params(axis="x", labelrotation=45)
+        ax.tick_params(axis="x", labelrotation=45)
+
     @staticmethod
     def _plot_statistics(ax, mean_value: float, lower_3s: float, upper_3s: float,
                          upper_limit: float, lower_limit: float) -> None:
-        ax.axhline(y=mean_value, color='blue', linestyle='-.')
-        ax.axhline(y=upper_3s, color="orange", linestyle='--')
-        ax.axhline(y=lower_3s, color="orange", linestyle='--')
-        ax.axhline(y=upper_limit, color="red", linestyle='-')
-        ax.axhline(y=lower_limit, color="red", linestyle='-')
+        ax.axhline(y=mean_value, color="blue", linestyle="-.", label="Mean Value")
+        ax.axhline(y=upper_3s, color="orange", linestyle="--", label="3 Sigma")
+        ax.axhline(y=lower_3s, color="orange", linestyle="--")
+        ax.axhline(y=upper_limit, color="red", linestyle="-", label="Limit")
+        ax.axhline(y=lower_limit, color="red", linestyle="-")
 
     def _plot_hist(self, data, ax_hist, bin_width) -> None:
         ax_hist.tick_params(axis="y", labelleft=False)
@@ -55,7 +67,7 @@ class Plot:
         scale_max = (int(self._max(data) / bin_width) + 1) * bin_width
 
         bins = [bin_element for bin_element in range(scale_min, scale_max + bin_width, bin_width)]
-        ax_hist.hist(data, bins=bins, orientation='horizontal')
+        ax_hist.hist(data, bins=bins, orientation="horizontal")
 
     def _plot_scatter(self, data, ax, lower_limit, upper_limit) -> None:
         for index, value in enumerate(data):
@@ -79,16 +91,11 @@ class Plot:
         ax.axis([0, len(data), self._min(data), self._max(data)])
         ax_hist = fig.add_subplot(gs[0, 1], sharey=ax)
 
-        self._plot_hist(data, ax_hist, bin_width=self._bin_width)
+        self._plot_hist(data, ax_hist, self._bin_width)
         self._plot_scatter(data, ax, lower_limit, upper_limit)
-        self._plot_statistics(ax, mean_value=mean_value, lower_3s=lower_3s, upper_3s=upper_3s,
-                              upper_limit=upper_limit, lower_limit=lower_limit)
-
-        plt.suptitle(title)
-        ax.set(xlabel=self._x_data_label, ylabel=self._y_label)
-        ax_hist.set(xlabel=self._x_hist_label)
-        ax_hist.tick_params(axis='x', labelrotation=45)
-        ax.tick_params(axis='x', labelrotation=45)
+        self._plot_statistics(ax, mean_value, lower_3s, upper_3s,
+                              upper_limit, lower_limit)
+        self._plot_labels(ax, ax_hist, title)
 
         self._figures[title] = fig
         self._figure_index += 1
@@ -97,6 +104,7 @@ class Plot:
     def show_plots() -> None:
         plt.show()
 
-    def save_plots(self) -> None:
+    def save_plots(self, dir_path: str = "./") -> None:
         for key, fig in self._figures.items():
-            fig.savefig(f"{key}_fig.png")
+            file_name = f"{key}_fig.png"
+            fig.savefig(path.join(dir_path, file_name))
