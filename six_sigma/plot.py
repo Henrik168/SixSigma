@@ -66,7 +66,7 @@ class Plot:
         scale_min = int(self._min(data))
         scale_max = (int(self._max(data) / bin_width) + 1) * bin_width
 
-        bins = [bin_element for bin_element in range(scale_min, scale_max + bin_width, bin_width)]
+        bins = [bin_element for bin_element in range(scale_min, scale_max, bin_width)]
         ax_hist.hist(data, bins=bins, orientation="horizontal")
 
     def _plot_scatter(self, data, ax, lower_limit, upper_limit) -> None:
